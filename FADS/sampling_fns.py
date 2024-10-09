@@ -140,7 +140,7 @@ class FADS:
         
         
 
-    def DS(self, n, ncomponent = 32, max_iter = 10, update_iter = 1, init_params='kmeans', n_update = -1, cov_type = 'diag'):
+    def DS(self, n, ncomponent = 32, max_iter = 10, update_iter = 1, init_params='kmeans', n_update = -1, cov_type = 'diag', existing_data=None):
         """
         Input: 
         n - number of sample points to be selected
@@ -181,10 +181,14 @@ class FADS:
             
         freq_update = math.floor(n/n_update)
 
+        if existing_data is not None:
+            sample_idx = list(existing_data)
+            rem_set = set(range(N)) - set(existing_data)
+        else:
+            sample_idx = []
+            rem_set = set(range(N))
+
         if freq_update > 0:
-            rem_idx = np.array(range(0,N,1))
-            rem_set = set(rem_idx)
-            sample_idx=[]
             for i in range(1,int(freq_update+1),1):
                 if i==1:
 
