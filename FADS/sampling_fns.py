@@ -140,7 +140,7 @@ class FADS:
         
         
 
-    def DS(self, n, ncomponent = 32, max_iter = 10, update_iter = 1, init_params='kmeans', n_update = -1, cov_type = 'diag', existing_data=None):
+    def DS(self, n, ncomponent=32, max_iter=10, update_iter=1, init_params='kmeans', n_update=-1, cov_type='diag', exclude_idx=None):
         """
         Input: 
         n - number of sample points to be selected
@@ -150,6 +150,7 @@ class FADS:
         init_params - Ways to initialize GMM parameters, must be 'kmeans' or 'random'
         n_update - The subsampling procedure is performed every n_update subsample points getting selected. n_update must be no larger than n. When n_udpate = -1, the function sets n_update as np.max([100,math.floor(n/10)]).
         cov_type - The covariance type to use for GMM density estimation. Can only be one of 'full', 'tied', 'diag', or 'spherical'.
+        exclude_idx - List of indexes that should not be selected.
 
 
         Output:
@@ -178,15 +179,16 @@ class FADS:
             n_update = np.max([100,math.floor(n/10)])
         elif n_update > n:
             raise ValueError("n_update cannot be larger than n.")
-            
+
+        rem_idx = np.array(range(0, N))
+        if exclude_idx is not None:
+            exclude_set = set(exclude_idx)
+            rem_idx = np.array([idx for idx in rem_idx if idx not in exclude_set])
+        
         freq_update = math.floor(n/n_update)
 
-        if existing_data is not None:
-            sample_idx = list(existing_data)
-            rem_set = set(range(N)) - set(existing_data)
-        else:
-            sample_idx = []
-            rem_set = set(range(N))
+        rem_set = set(rem_idx)
+        sample_idx = []
 
         if freq_update > 0:
             for i in range(1,int(freq_update+1),1):
